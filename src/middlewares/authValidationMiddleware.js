@@ -1,11 +1,11 @@
-import { usersCollection } from "../database/db.js";
+import { sessionsollection, usersCollection } from "../database/db.js";
 import { usersSchema } from "../schemas/usersSchema.js";
 import bcrypt from "bcrypt";
 
 export function userSchemaValidation(req, res, next) {
   const user = req.body;
 
-  const { error } = usersSchema.validate(req.body);
+  const { error } = usersSchema.validate(user, { abortEarly: false });
   if (error) {
     const errors = error.details.map((detail) => detail.message);
     return res.status(400).send(errors);
@@ -30,5 +30,27 @@ export async function signinSchemaValidation(req, res, next) {
     console.log(err);
     res.sendStatus(500);
   }
+  next();
+}
+
+export async function authRoutesValidation(req, res, next) {
+  
+  const autorization = req.headers;
+  const token = autorization?.replace("Bearer ", "");
+
+  if (!token) {
+    res.sendStatus(401);
+  }
+  try { 
+    const session = await sessionsollection.findOne({ token });
+    const user = await usersCollection.findOne({ _id: session.userId });
+    if (!user) {
+      res.sendStatus(401);
+    }
+    res.locals.user = user;
+    } catch (err) { 
+      console.log(err); 
+      res.sendStatus(500);  
+    }
   next();
 }
