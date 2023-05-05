@@ -1,7 +1,8 @@
-import { usersCollection } from "../database/database.js";
+import { sessionsollection, usersCollection } from "../database/db.js";
 import bcrypt from "bcrypt";
+import {v4 as uuidv4} from "uuid";
 
-export async function singUp(req, res) {
+export async function signUp(req, res) {
   const user = res.locals.user;
   const passwordHash = bcrypt.hashSync(user.password, 10);
   try {
@@ -12,4 +13,16 @@ export async function singUp(req, res) {
   }
 }
 
-export async function sigIn(req, res) {}
+export async function signin(req, res) {
+const user = res.locals.user;
+  const token = uuidv4();
+
+  try { 
+    await sessionsollection.insertOne({ token, userId: user._id });
+    res.send({ token });
+  }
+  catch (err) { 
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
