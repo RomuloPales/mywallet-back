@@ -6,7 +6,12 @@ export async function signUp(req, res) {
   const user = res.locals.user;
   const passwordHash = bcrypt.hashSync(user.password, 10);
   try {
+    const userExists =  await usersCollection.findOne({ email: user.email });
+     if(userExists) {
+      return res.sendStatus(409);
+    }
     await usersCollection.insertOne({ ...user, password: passwordHash });
+    
     res.sendStatus(201);
   } catch (err) {
     res.sendStatus(500);

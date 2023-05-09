@@ -9,6 +9,6 @@ import { authRoutesValidation } from "../middlewares/authValidationMiddleware.js
 const router = Router();
 
 router.post("/transactions", authRoutesValidation,transactionValidationSchema,  createTransaction);
-router.get("/transactions", getTransactions);
+router.get("/transactions", authRoutesValidation, getTransactions);
 
 export default router;

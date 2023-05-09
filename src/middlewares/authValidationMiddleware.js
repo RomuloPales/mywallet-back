@@ -34,23 +34,23 @@ export async function signinSchemaValidation(req, res, next) {
 }
 
 export async function authRoutesValidation(req, res, next) {
-  
-  const autorization = req.headers;
-  const token = autorization?.replace("Bearer ", "");
+  const { authorization } = req.headers;
 
+  const token = authorization?.replace("Bearer ", "");
   if (!token) {
-    res.sendStatus(401);
+    return res.sendStatus(401);
   }
-  try { 
+  try {
     const session = await sessionsollection.findOne({ token });
-    const user = await usersCollection.findOne({ _id: session.userId });
+    const user = await usersCollection.findOne({ _id: session?.userId });
+
     if (!user) {
-      res.sendStatus(401);
+     return res.sendStatus(401);
     }
     res.locals.user = user;
-    } catch (err) { 
-      console.log(err); 
-      res.sendStatus(500);  
-    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
   next();
 }
