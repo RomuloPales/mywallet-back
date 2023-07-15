@@ -21,10 +21,11 @@ export async function signUp(req, res) {
 export async function signin(req, res) {
 const user = res.locals.user;
   const token = uuidv4();
+  const {name} = user;
 
   try { 
     await sessionsollection.insertOne({ token, userId: user._id });
-    res.send({ token });
+    res.send({ name, token });
   }
   catch (err) { 
     console.log(err);
