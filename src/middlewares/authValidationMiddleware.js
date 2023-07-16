@@ -38,16 +38,14 @@ export async function authRoutesValidation(req, res, next) {
 
   const token = authorization?.replace("Bearer ", "");
   if (!token) {
-    return res.status(401).send("algo errado naõ esta certo");
+    return res.sendStatus(401);
   }
 
   try {
     const session = await sessionsollection.findOne({ token });
     const user = await usersCollection.findOne({ _id: session?.userId });
-    console.log(session, "sessão", user,"oi");
     if (!user) {
-     return res.sendStatus(401);
-
+      return res.sendStatus(401);
     }
     res.locals.user = user;
   } catch (err) {
